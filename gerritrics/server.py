@@ -51,6 +51,11 @@ static_root = '{0}/static'.format(script_path)
 def index_route():
     return {'nav': True}
 
+@app.route('/timeline/<user:int>')
+@view('timeline')
+def timeline_page_route(user):
+    return {'nav': True, 'name': 'Timeline', 'user': user}
+
 @app.route('/static/<filepath:path>')
 def static_route(filepath):
     return static_file(filepath, root=static_root)
@@ -68,20 +73,26 @@ def favicon():
 
 ## Dynamic routes ##############################################################
 
-@app.route('/timeline/<user:int>')
-@view('timeline')
+@app.route('/data/timeline/<user:int>')
 def timeline_route(user):
-    c=changes.find({"approvals": {"$elemMatch":
-                                {"approvals": {"$elemMatch":
-                                               {"$and":
-                                                [{"key.accountId.id":user}]
-                                            }}}}})
+    c = changes.find({"approvals": {"$elemMatch":
+                                    {"approvals": {"$elemMatch":
+                                                   {"$and":
+                                                    [{"key.accountId.id":user}]
+                                                }}}}})
 
     account =  [a for a in c[0]['accounts']['accounts']
                 if not isinstance(a['id'], int)
                 and a['id']['id'] == user][0]
 
-    return {'nav': False, 'name': account['fullName'] }
+    approvals = []
+    for change in c:
+        for approval1 in change['approvals']:
+            for approval2 in approval1['approvals']:
+                if approval2['key']['accountId']['id'] == user:
+                    approvals.append(approval2)
+
+    return {'nav': False, 'name': account['fullName'], 'approvals': approvals }
 
 ################################################################################
 # Main

@@ -9,21 +9,21 @@ import sys
 
 from setuptools import setup, find_packages
 
-from activity.version import get_version
+from gerritrics.version import get_version
 
 readme = open('README.rst').read()
 
 long_description = readme
 
 setup(
-    name='activity',
+    name='gerritrics',
     version=get_version(),
-    description='OpenStack Activity is for visualising activity in OpenStack.',
+    description='Gerrit Metrics',
     long_description=long_description,
     author='Thom Leggett',
     author_email='thom@tteggel.org',
-    packages=['activity', 'activity.test'],
-    test_suite='activity.test',
+    packages=['gerritrics', 'gerritrics.test'],
+    test_suite='gerritrics.test',
     tests_require=['nose',
                    'ws4py>=0.2.4',
                    'requests>=1.1.0',
@@ -33,7 +33,7 @@ setup(
                       'pymongo==2.5.2'],
     entry_points={
         'console_scripts': [
-            'openstack-activity = activity.server:main',
+            'gerritrics = gerritrics.server:main',
         ]
     },
     zip_safe=False,

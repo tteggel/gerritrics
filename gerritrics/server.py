@@ -8,6 +8,7 @@ import argparse
 import os
 
 import version
+from team import team_roster
 
 ################################################################################
 # Command line config
@@ -93,6 +94,52 @@ def timeline_route(user):
                     approvals.append(approval2)
 
     return {'nav': False, 'name': account['fullName'], 'approvals': approvals }
+
+
+@app.route('/team/<team>')
+@view('team')
+def team_route(team):
+
+    for person in team_roster:
+        person['reviews'] = [review_count(person['gerrit'], x)
+                             for x in range(-2, 3)]
+        person['name'] = account_name(person['gerrit'],
+                                      person['name'])
+
+    return {'nav': True, 'name': 'Team',
+            'team': sorted(team_roster, key=lambda x: x['name'])}
+
+################################################################################
+# Data functions
+################################################################################
+
+def review_count(account, value,
+                 startdate="2013-01-01 00:00:00.000000000",
+                 enddate="2014-01-01 00:00:00.000000000"):
+    return changes.find({"approvals":
+                         {"$elemMatch":
+                          {"approvals": {"$elemMatch":
+                                         {"$and":
+                                          [{"key.accountId.id": account},
+                                           {"granted":
+                                            {"$gte": startdate,
+                                             "$lt": enddate}},
+                                           {"value": value}]}}}}}).count()
+
+def account_name(account, name):
+    c = changes.find(
+        {"approvals":
+         {"$elemMatch":
+          {"approvals": {"$elemMatch":
+                         {"$and":
+                          [{"key.accountId.id":account}]}}}}})
+
+    if c.count() == 0:
+        return name
+
+    return [a for a in c[0]['accounts']['accounts']
+                if not isinstance(a['id'], int)
+                and a['id']['id'] == account][0]['fullName']
 
 ################################################################################
 # Main

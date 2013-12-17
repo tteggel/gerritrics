@@ -1,1 +1,2 @@
-recursive-include activity/static *
+recursive-include gerritrics/static *
+recursive-include gerritrics/views *

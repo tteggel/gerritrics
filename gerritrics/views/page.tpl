@@ -12,8 +12,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/activity.css" rel="stylesheet">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->

@@ -1,5 +1,13 @@
 %rebase page nav=nav, name=name
-<table class="table table-hover table-condensed table-bordered">
+<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10-dev/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" language="javascript" src="/static/js/dataTables.bootstrap.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/css/dataTables.bootstrap.css">
+<script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+                $('#changes').dataTable();
+        } );
+</script>
+<table id="changes" class="table table-hover table-condensed table-bordered">
  <thead>
   <tr>
    <th rowspan="3">Change-Id</th>

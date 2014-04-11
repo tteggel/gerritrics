@@ -3,9 +3,12 @@
 <script type="text/javascript" language="javascript" src="/static/js/dataTables.bootstrap.js"></script>
 <link rel="stylesheet" type="text/css" href="/static/css/dataTables.bootstrap.css">
 <script type="text/javascript" charset="utf-8">
-        $(document).ready(function() {
-                $('#changes').dataTable();
-        } );
+    $(document).ready(function() {
+        table = $('#changes').dataTable();
+        $(window).bind('resize', function () {
+            table.fnAdjustColumnSizing();
+        });
+    });
 </script>
 <table id="changes" class="table table-hover table-condensed table-bordered">
  <thead>

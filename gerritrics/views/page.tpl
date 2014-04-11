@@ -27,8 +27,7 @@
 
   <body>
 
-    <div class="container">
-
+    <div class="container-fluid">
 %if defined('nav') and nav:
       <div class="masthead">
         <ul class="nav nav-pills pull-right">

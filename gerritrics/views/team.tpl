@@ -21,7 +21,6 @@
     <td>{{sum(person['reviews'])}}</td>
     <td>{{person['reviews'][0]}}</td>
     <td>{{person['reviews'][1]}}</td>
-    <td>{{person['reviews'][2]}}</td>
     <td>{{person['reviews'][3]}}</td>
     <td>{{person['reviews'][4]}}</td>
   </tr>

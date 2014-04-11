@@ -27,14 +27,14 @@
 
   <body>
 
-    <div class="container-narrow">
+    <div class="container">
 
 %if defined('nav') and nav:
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
           <li><a href="/">Home</a></li>
         </ul>
-        <h3 class="muted">OpenStack Nova Gerrit Metrics</h3>
+        <h3 class="muted">OpenStack Gerrit Metrics</h3>
       </div>
       <hr>
 %end
@@ -46,10 +46,10 @@
 
       <div class="footer row">
         <p>
-          &copy; <a href="http://tteggel.org">Thom Leggett</a> 2013
-          &mdash; <a href="https://twitter.com/thomleggett/">@thomleggett</a>
-          &mdash; <a href="https://github.com/thom-leggett/gerritrics">Fork it!</a>
+          &copy; <a href="http://hp.com">Hewlett-Packard Development Company L.P.</a> 2014
+          &mdash; <a href="https://github.com/thom-leggett/gerritrics">Source</a>
           &mdash; <a href="https://hpcloud.com">Hosted on the HP Cloud</a>
+        </p>
       </div>
 %end
 

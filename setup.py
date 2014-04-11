@@ -30,7 +30,9 @@ setup(
                    'webtest>=1.4.3'],
     install_requires=['bottle==0.11.6',
                       'gevent==0.13.8',
-                      'pymongo==2.5.2'],
+                      'pymongo==2.5.2',
+                      'ago==0.0.6',
+                      'requests==1.1.0'],
     entry_points={
         'console_scripts': [
             'gerritrics = gerritrics.server:main',

@@ -11,7 +11,7 @@ var margin = { top: 30, right: 20, bottom: 0, left: 30},
     height = 430 - margin.top - margin.bottom,
     gridSize = Math.floor(width / 24),
     colours = ["#ff0000", "#880000", "#cccc00","#008800","#00ff00"],
-    days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+    days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
     times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
 
 

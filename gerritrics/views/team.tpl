@@ -1,6 +1,14 @@
 %rebase page nav=nav, name=name
 %import urllib
-<table class="table table-striped">
+<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10-dev/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" language="javascript" src="/static/js/dataTables.bootstrap.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/css/dataTables.bootstrap.css">
+<script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+                $('#team').dataTable();
+        } );
+</script>
+<table id="team" class="table table-hover table-condensed table-bordered">
  <thead>
   <tr>
    <th>Name</th>

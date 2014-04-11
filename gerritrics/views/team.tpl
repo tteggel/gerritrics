@@ -17,6 +17,7 @@
    <th>-1</th>
    <th>+1</th>
    <th>+2</th>
+   <th>niceness ratio</th>
   </tr>
  </thead>
  <tbody>
@@ -30,6 +31,7 @@
     <td>{{person['reviews'][1]}}</td>
     <td>{{person['reviews'][3]}}</td>
     <td>{{person['reviews'][4]}}</td>
+    <td>{{0 if sum(person['reviews']) == 0 else '{0:.2f}'.format(float((person['reviews'][3]+person['reviews'][4]) - (person['reviews'][0] + person['reviews'][1]))/sum(person['reviews']))}}</td>
   </tr>
   % end #for
   % end #if

@@ -6,6 +6,7 @@ from pymongo import MongoClient
 
 import argparse
 import os
+import urllib
 
 import version
 from team import team_roster
@@ -52,7 +53,7 @@ static_root = '{0}/static'.format(script_path)
 def index_route():
     return {'nav': True}
 
-@app.route('/timeline/<user:int>')
+@app.route('/timeline/<user>')
 @view('timeline')
 def timeline_page_route(user):
     return {'nav': True, 'name': 'Timeline', 'user': user}
@@ -74,42 +75,32 @@ def favicon():
 
 ## Dynamic routes ##############################################################
 
-@app.route('/data/timeline/<user:int>')
+@app.route('/data/timeline/<user>')
 def timeline_route(user):
-    c = changes.find({"approvals": {"$elemMatch":
-                                    {"approvals": {"$elemMatch":
-                                                   {"$and":
-                                                    [{"key.accountId.id":user}]
-                                                }}}}})
-
-    account =  [a for a in c[0]['accounts']['accounts']
-                if not isinstance(a['id'], int)
-                and a['id']['id'] == user][0]
-
+    user = urllib.unquote(user)
+    c = changes.find({"patchSets.approvals.by.email": user})
     approvals = []
     for change in c:
-        for approval1 in change['approvals']:
-            for approval2 in approval1['approvals']:
-                if approval2['key']['accountId']['id'] == user:
-                    approvals.append(approval2)
+        for patchset in change['patchSets']:
+	    if 'approvals' not in patchset: continue
+            for approval in patchset['approvals']:
+                if 'email' in approval['by'] and approval['by']['email'] == user:
+                    approvals.append(approval)
 
-    return {'nav': False, 'name': account['fullName'], 'approvals': approvals }
-
+    return {'nav': False, 'name': user, 'approvals': approvals }
 
 @app.route('/team/<team>')
 @view('team')
 def team_route(team):
 
-    reviews =  review_count(map(lambda x: x['gerrit'], team_roster[team]))
+    reviews =  review_count(map(lambda x: x['email'], team_roster[team]))
 
     for person in team_roster[team]:
-        account = person['gerrit']
+        account = person['email']
         person['reviews'] = [0 if account not in reviews or
                                   x not in reviews[account] else
                              reviews[account][x]
                              for x in range(-2, 3)]
-        person['name'] = account_name(person['gerrit'],
-                                      person['name'])
 
     return {'nav': True, 'name': 'Team',
             'team': sorted(team_roster[team], key=lambda x: x['name'].lower())}
@@ -121,41 +112,24 @@ def team_route(team):
 def review_count(team):
 
     raw = changes.aggregate([
-        {"$match": {"accounts.accounts.id.id": {"$in": team}}},
-        {"$unwind": "$approvals"},
-        {"$unwind": "$approvals.approvals"},
-        {"$match": {"approvals.approvals.key.accountId.id": {"$in": team}}},
-        {"$group": {"_id": {"account": "$approvals.approvals.key.accountId.id",
-                            "value": "$approvals.approvals.value"},
+        {"$match": {"patchSets.approvals.by.email": {"$in": team}}},
+        {"$unwind": "$patchSets"},
+        {"$unwind": "$patchSets.approvals"},
+        {"$match": {"patchSets.approvals.by.email": {"$in": team}}},
+        {"$group": {"_id": {"account": "$patchSets.approvals.by.email",
+                            "value": "$patchSets.approvals.value"},
                     "count": {"$sum": 1}}}
     ])['result']
 
     result = {}
     for r in raw:
-        value = r['_id']['value']
+        value = int(r['_id']['value'])
         account = r['_id']['account']
         count = r['count']
         if account not in result: result[account] = {}
         result[account][value] = r['count']
 
     return result
-
-
-
-def account_name(account, name):
-    c = changes.find(
-        {"approvals":
-         {"$elemMatch":
-          {"approvals": {"$elemMatch":
-                         {"$and":
-                          [{"key.accountId.id":account}]}}}}})
-
-    if c.count() == 0:
-        return name
-
-    return [a for a in c[0]['accounts']['accounts']
-                if not isinstance(a['id'], int)
-                and a['id']['id'] == account][0]['fullName']
 
 ################################################################################
 # Main

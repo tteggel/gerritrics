@@ -1,5 +1,5 @@
 %rebase page nav=nav, name=name
-
+%import urllib
 <table class="table table-striped">
  <thead>
   <tr>
@@ -15,8 +15,9 @@
  <tbody>
   % if defined('team') and team:
   % for person in team:
+  % email_escaped=urllib.quote(person['email'])
   <tr>
-    <td><a href="/timeline/{{person['gerrit']}}">{{person['name']}}</a></td>
+    <td><a href="/timeline/{{email_escaped}}">{{person['name']}}</a></td>
     <td>{{sum(person['reviews'])}}</td>
     <td>{{person['reviews'][0]}}</td>
     <td>{{person['reviews'][1]}}</td>

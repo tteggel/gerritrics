@@ -19,7 +19,7 @@ Timeline.render = function (data) {
           $(".jumbotron").html("<h1>" + data.name + "</h1>");
 
           data = data.approvals.map(
-            function (i) {i.granted = new Date(i.granted.replace(" ", "T") + "+0000"); return i});
+            function (i) {i.grantedOn = new Date(i.grantedOn * 1000); return i});
 
           var svg = d3.select("#chart").append("svg")
               .attr("width", width + margin.left + margin.right)
@@ -50,22 +50,14 @@ Timeline.render = function (data) {
               .enter()
               .append("circle")
               .attr("cx", function(d) { return gridSize *
-                                        (d.granted.getHours() + (d.granted.getMinutes() / 60)); })
-              .attr("cy", function(d) { return (d.granted.getDay()) * gridSize; })
+                                        (d.grantedOn.getHours() + (d.grantedOn.getMinutes() / 60)); })
+              .attr("cy", function(d) { return (d.grantedOn.getDay()) * gridSize; })
               .attr("transform", "translate(" + gridSize / 2 + ", " + gridSize / 2  + ")")
               .attr("class", "hour bordered")
-  .attr("onclick", function (d) {return "window.location.href='https://review.openstack.org/#/c/"
-                                 + d.key.patchSetId.changeId.id + "/"
-                                 + d.key.patchSetId.patchSetId + "'";})
               .attr("r", (gridSize/2)-6)
               .style("fill", colours[0]);
 
           heatMap.transition().duration(1000)
-              .style("fill", function(d) { return colours[d.value + 2]; });
-
-          heatMap.append("title").text(function(d) { return (d.value > 0 ? "+" : "") + d.value + " at "
-                                                     + "https://review.openstack.org/#/c/"
-                                                     + d.key.patchSetId.changeId.id + "/"
-                                                     + d.key.patchSetId.patchSetId; });
+              .style("fill", function(d) { return colours[parseInt(d.value) + 2]; });
 
       };

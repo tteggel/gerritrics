@@ -16,7 +16,7 @@
   % if defined('team') and team:
   % for person in team:
   <tr>
-    <td>{{person['name']}}</td>
+    <td><a href="/timeline/{{person['gerrit']}}">{{person['name']}}</a></td>
     <td>{{sum(person['reviews'])}}</td>
     <td>{{person['reviews'][0]}}</td>
     <td>{{person['reviews'][1]}}</td>

@@ -100,31 +100,47 @@ def timeline_route(user):
 @view('team')
 def team_route(team):
 
-    for person in team_roster:
-        person['reviews'] = [review_count(person['gerrit'], x)
+    reviews =  review_count(map(lambda x: x['gerrit'], team_roster[team]))
+
+    for person in team_roster[team]:
+        account = person['gerrit']
+        person['reviews'] = [0 if account not in reviews or
+                                  x not in reviews[account] else
+                             reviews[account][x]
                              for x in range(-2, 3)]
         person['name'] = account_name(person['gerrit'],
                                       person['name'])
 
     return {'nav': True, 'name': 'Team',
-            'team': sorted(team_roster, key=lambda x: x['name'])}
+            'team': sorted(team_roster[team], key=lambda x: x['name'].lower())}
 
 ################################################################################
 # Data functions
 ################################################################################
 
-def review_count(account, value,
-                 startdate="2013-01-01 00:00:00.000000000",
-                 enddate="2014-01-01 00:00:00.000000000"):
-    return changes.find({"approvals":
-                         {"$elemMatch":
-                          {"approvals": {"$elemMatch":
-                                         {"$and":
-                                          [{"key.accountId.id": account},
-                                           {"granted":
-                                            {"$gte": startdate,
-                                             "$lt": enddate}},
-                                           {"value": value}]}}}}}).count()
+def review_count(team):
+
+    raw = changes.aggregate([
+        {"$match": {"accounts.accounts.id.id": {"$in": team}}},
+        {"$unwind": "$approvals"},
+        {"$unwind": "$approvals.approvals"},
+        {"$match": {"approvals.approvals.key.accountId.id": {"$in": team}}},
+        {"$group": {"_id": {"account": "$approvals.approvals.key.accountId.id",
+                            "value": "$approvals.approvals.value"},
+                    "count": {"$sum": 1}}}
+    ])['result']
+
+    result = {}
+    for r in raw:
+        value = r['_id']['value']
+        account = r['_id']['account']
+        count = r['count']
+        if account not in result: result[account] = {}
+        result[account][value] = r['count']
+
+    return result
+
+
 
 def account_name(account, name):
     c = changes.find(

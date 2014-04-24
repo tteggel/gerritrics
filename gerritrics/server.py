@@ -187,18 +187,18 @@ def summarise_change(change):
             result = { k: len(filter(value_is(k), a))
                          for k in ['-2', '-1', '1', '2'] }
             first_review = sorted(a, key=lambda x: x['grantedOn'])[0]
-            result['ttfr'] = first_review['grantedOn'] - change['createdOn']
+            result['ttfr'] = first_review['grantedOn'] - patchset['createdOn']
             return result
 
-        def not_jenkins(a):
-            return a['by']['username'] != 'jenkins'
+        def is_a_review(a):
+            return a['type'] == 'CRVW'
 
         def empty_summary():
             return { k: 0 for k in ['-2', '-1', '1', '2', 'ttfr'] }
 
         s = {}
         if 'approvals' in patchset:
-            approvals = filter(not_jenkins, patchset['approvals'])
+            approvals = filter(is_a_review, patchset['approvals'])
             if len(approvals) > 0:
                 s['all'] = summarise_approvals(approvals)
 

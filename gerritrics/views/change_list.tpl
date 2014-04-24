@@ -26,6 +26,8 @@
                                  return moment.duration(data * 1000).humanize()
                                } else if (type === 'display' && data == 0) {
                                  return 'still waiting';
+                               } else if (type === 'display') {
+                                 return "-" + moment.duration(Math.abs(data) * 1000).humanize();
                                } else {
                                  return data;
                                }

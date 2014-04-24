@@ -183,38 +183,63 @@ def summarise_change(change):
                     and project in projects
                     and x['by']['username'] in projects[project])
 
+        def summarise_approvals(a):
+            result = { k: len(filter(value_is(k), a))
+                         for k in ['-2', '-1', '1', '2'] }
+            first_review = sorted(a, key=lambda x: x['grantedOn'])[0]
+            result['ttfr'] = first_review['grantedOn'] - change['createdOn']
+            return result
+
+        def not_jenkins(a):
+            return a['by']['username'] != 'jenkins'
+
+        def empty_summary():
+            return { k: 0 for k in ['-2', '-1', '1', '2', 'ttfr'] }
+
         s = {}
         if 'approvals' in patchset:
-            approvals = patchset['approvals']
+            approvals = filter(not_jenkins, patchset['approvals'])
+            if len(approvals) > 0:
+                s['all'] = summarise_approvals(approvals)
+
             core_approvals = filter(is_core(change['project']), approvals)
+            if len(core_approvals) > 0:
+                s['cores'] = summarise_approvals(core_approvals)
 
-            s['all'] = { k: len(filter(value_is(k), approvals))
-                         for k in ['-2', '-1', '1', '2'] }
+        if 'all' not in s:
+            s['all'] = empty_summary()
 
-            s['cores'] = { k: len(filter(value_is(k), core_approvals))
-                           for k in ['-2', '-1', '1', '2'] }
-
-        else:
-            s['all'] = { k: 0 for k in ['-2', '-1', '1', '2'] }
-            s['cores'] = s['all']
+        if 'cores' not in s:
+            s['cores'] = empty_summary()
 
         patchset['summary'] = s
 
         return patchset
 
-    def sum_summary(l):
+    def summarise_summary(l, f):
         r = {}
         for p in l:
             for (t, v) in p['summary'].items():
                 if t not in r: r[t] = {}
                 for (n, c) in v.items():
-                    if n not in r[t]: r[t][n] = 0
-                    r[t][n] += c
+                    if n not in r[t]: r[t][n] = []
+                    r[t][n].append(c)
+
+        for (t, v) in r.items():
+            for (n, c) in v.items():
+                r[t][n] = f[n](c)
         return r
+
+    def avg(l):
+        return float(sum(l)) / len(l) if len(l) > 0 else float('nan')
 
     change['currentPatchSet'] = summarise_patchset(change['currentPatchSet'])
     change['patchSets'] = map(summarise_patchset, change['patchSets'])
-    change['summary'] = sum_summary(change['patchSets'])
+    change['summary'] = summarise_summary(change['patchSets'], {'-2': sum,
+                                                                '-1': sum,
+                                                                '1': sum,
+                                                                '2': sum,
+                                                                'ttfr': avg})
     return change
 
 

@@ -15,9 +15,9 @@ import version
 from team import team_roster
 from change_list import change_lists
 
-#################################################################################
+################################################################################
 # Command line config
-#################################################################################
+################################################################################
 
 script_path = os.path.dirname(__file__)
 parser = argparse.ArgumentParser(
@@ -37,15 +37,15 @@ parser.add_argument('-n', '--mongoport', default=27017,
                     type=int)
 args = parser.parse_args()
 
-#################################################################################
+################################################################################
 # App setup
-#################################################################################
+################################################################################
 
 app = Bottle()
 changes = MongoClient(args.mongohost, args.mongoport).openstack_gerrit.changes
 bottle.TEMPLATE_PATH.append('{0}/views'.format(script_path))
 
-## Project lists ################################################################
+## Project lists ###############################################################
 
 def get_projects():
     host = 'https://git.openstack.org'
@@ -63,11 +63,11 @@ def get_projects():
 
 projects = get_projects()
 
-#################################################################################
+################################################################################
 # Routes
-#################################################################################
+################################################################################
 
-## Root routes ##################################################################
+## Root routes #################################################################
 
 static_root = '{0}/static'.format(script_path)
 
@@ -91,7 +91,7 @@ def slash_route(filepath):
 def favicon():
     return static_route('favicon.ico')
 
-## Timeline routes ##############################################################
+## Timeline routes #############################################################
 
 @app.route('/timeline/<user>')
 @view('timeline')
@@ -107,12 +107,13 @@ def timeline_route(user):
         for patchset in change['patchSets']:
             if 'approvals' not in patchset: continue
             for approval in patchset['approvals']:
-                if 'email' in approval['by'] and approval['by']['email'] == user:
+                if ('email' in approval['by'] 
+                and approval['by']['email'] == user):
                     approvals.append(approval)
 
     return {'nav': False, 'name': user, 'approvals': approvals }
 
-## Team routes ##################################################################
+## Team routes #################################################################
 
 @app.route('/team/<team>')
 @view('team')
@@ -152,7 +153,7 @@ def review_count(team):
 
     return result
 
-## Changelist routes #############################################################
+## Changelist routes ###########################################################
 
 @app.route('/changes/<listname>')
 @view('change_list')
@@ -191,7 +192,7 @@ def summarise_change(change):
             return result
 
         def is_a_review(a):
-            return a['type'] == 'CRVW'
+            return a['type'] == 'Code-Review'
 
         def empty_summary():
             return { k: 0 for k in ['-2', '-1', '1', '2', 'ttfr'] }
@@ -243,9 +244,9 @@ def summarise_change(change):
     return change
 
 
-#################################################################################
+################################################################################
 # Main
-#################################################################################
+################################################################################
 
 def main():
     """

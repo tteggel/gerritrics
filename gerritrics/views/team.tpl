@@ -5,7 +5,9 @@
 <link rel="stylesheet" type="text/css" href="/static/css/dataTables.bootstrap.css">
 <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
-                $('#team').dataTable();
+                $('#team').dataTable({
+                        "iDisplayLength": 100
+                } );
         } );
 </script>
 <table id="team" class="table table-hover table-condensed table-bordered">
